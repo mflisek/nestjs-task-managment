@@ -13,6 +13,8 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from 'src/auth/get-user.decorator';
+import { User } from 'src/auth/user.entity';
 import { CreateTaskDto } from './dto/create-tasl.dto';
 import { GetTaskFilterDto } from './dto/get-task-filter.dto';
 import { TaskStatusValidationPipe } from './pipes/task-status-validation';
@@ -26,30 +28,43 @@ export class TasksController {
   constructor(private taskservis: TasksService) {}
 
   @Get()
-  async getTasks(@Query(ValidationPipe) filterDto: GetTaskFilterDto) {
-    return this.taskservis.getTask(filterDto);
+  async getTasks(
+    @Query(ValidationPipe) filterDto: GetTaskFilterDto,
+    @GetUser() user: User,
+  ) {
+    return this.taskservis.getTask(filterDto, user);
   }
   @Get('/:id')
-  getTaslById(@Param('id', ParseIntPipe) id: number): Promise<Task> {
-    return this.taskservis.getTaskById(id);
+  getTaskById(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User,
+  ): Promise<Task> {
+    return this.taskservis.getTaskById(id, user);
   }
 
   @Post()
   @UsePipes(ValidationPipe)
-  async creatTask(@Body() creatTaskDto: CreateTaskDto): Promise<Task> {
-    return await this.taskservis.createTask(creatTaskDto);
+  async creatTask(
+    @Body() creatTaskDto: CreateTaskDto,
+    @GetUser() user: User,
+  ): Promise<Task> {
+    return await this.taskservis.createTask(creatTaskDto, user);
   }
 
   @Delete('/:id')
-  deleteTaskByid(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.taskservis.deleteTaskById(id);
+  deleteTaskByid(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User,
+  ): Promise<void> {
+    return this.taskservis.deleteTaskById(id, user);
   }
 
   @Patch('/:id/status')
   async updateTaskStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body('status', TaskStatusValidationPipe) status: TaskStatus,
+    @GetUser() user: User,
   ): Promise<Task> {
-    return await this.taskservis.UpdateTaskStatus(id, status);
+    return await this.taskservis.UpdateTaskStatus(id, status, user);
   }
 }
