@@ -14,7 +14,7 @@ export class TasksService {
     private taskRepository: TaskRepository,
   ) {}
 
-  getTask(filterDto: GetTaskFilterDto, user: User) {
+  getTasks(filterDto: GetTaskFilterDto, user: User) {
     return this.taskRepository.getTasks(filterDto, user);
   }
 
